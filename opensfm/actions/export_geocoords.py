@@ -141,14 +141,19 @@ def _transform_dense_point_cloud(
     with io.open_rt(input_path) as fin:
         with io.open_wt(output_path) as fout:
             for i, line in enumerate(fin):
-                if i < 13:
+                if i <= 13:
                     fout.write(line)
                 else:
-                    x, y, z, nx, ny, nz, red, green, blue = line.split()
-                    x, y, z = np.dot(A, map(float, [x, y, z])) + b
-                    nx, ny, nz = np.dot(A, map(float, [nx, ny, nz]))
-                    fout.write(
-                        "{} {} {} {} {} {} {} {} {}\n".format(
-                            x, y, z, nx, ny, nz, red, green, blue
-                        )
-                    )
+                    tmp = line.split()
+                    if len(tmp) < 8:
+                        print("UBC TL34: Shouldnt be here")
+                        fout.write(line)
+                    else:
+                        x, y, z, nx, ny, nz, red, green, blue, class_out = tmp
+                        x, y, z = np.dot(A, [float(x), float(y), float(z)]) + b
+                        nx, ny, nz = np.dot(A, [float(nx), float(ny), float(nz)])
+                        fout.write(
+                            "{} {} {} {} {} {} {} {} {} {}\n".format(
+                                y, x, z, nx, ny, nz, red, green, blue, class_out
+                            )
+                        ) 
